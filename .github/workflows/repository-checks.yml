@@ -1,0 +1,120 @@
+name: Repository safety
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-safety-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repository-safety:
+    name: repository-safety
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Validate tracked repository contents
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          required_paths=(
+            README.md
+            CONTRIBUTING.md
+            .editorconfig
+            .gitattributes
+            .gitignore
+            .github/pull_request_template.md
+            .github/workflows/repository-checks.yml
+            config/README.md
+            data/README.md
+            docs/README.md
+            hardware/README.md
+            models/README.md
+            scripts/README.md
+            simulation/README.md
+            src/README.md
+            tests/README.md
+          )
+
+          missing=0
+          for path in "${required_paths[@]}"; do
+            if [[ ! -s "$path" ]]; then
+              printf 'Missing or empty required file: %s\n' "$path" >&2
+              missing=1
+            fi
+          done
+          if (( missing != 0 )); then
+            exit 1
+          fi
+
+          empty_tree="$(git hash-object -t tree /dev/null)"
+          git diff --check "$empty_tree" HEAD
+
+          while IFS= read -r -d '' script; do
+            bash -n "$script"
+          done < <(git ls-files -z -- '*.sh')
+
+          invalid=0
+          size_limit=52428800
+          while IFS= read -r -d '' file; do
+            case "$file" in
+              AGENTS.md|AGENTS.override.md|.codex/*|.codex-log/*|CLAUDE.md|CLAUDE.local.md|.claude/*|MEMORY.md|.mcp.json|local/*)
+                printf 'Private local/AI file is tracked: %s\n' "$file" >&2
+                invalid=1
+                ;;
+            esac
+
+            case "$file" in
+              *.asv|*.autosave|*.m~|*.slxc|*.mex*|slprj/*|*/slprj/*|sccprj/*|*/sccprj/*|codegen/*|*/codegen/*|*_ert_rtw/*|*/*_ert_rtw/*|*_grt_rtw/*|*/*_grt_rtw/*|*_rsim_rtw/*|*/*_rsim_rtw/*|*_sfprj/*|*/*_sfprj/*|*_sfun_rtw/*|*/*_sfun_rtw/*)
+                printf 'Generated MATLAB/Simulink artifact is tracked: %s\n' "$file" >&2
+                invalid=1
+                ;;
+            esac
+
+            case "$file" in
+              .env|*.pem|*.key|id_rsa|id_dsa|id_ecdsa|id_ed25519|credentials.json|secrets.json)
+                printf 'Credential-like file is tracked: %s\n' "$file" >&2
+                invalid=1
+                ;;
+            esac
+
+            size="$(stat -c %s -- "$file")"
+            if (( size > size_limit )); then
+              printf 'Tracked file exceeds 50 MiB: %s (%s bytes)\n' "$file" "$size" >&2
+              invalid=1
+            fi
+          done < <(git ls-files -z)
+
+          if (( invalid != 0 )); then
+            exit 1
+          fi
+
+          if git grep -nIE '^(<{7} .+|={7}|>{7} .+)$' -- .; then
+            printf '%s\n' 'Conflict markers found in tracked text.' >&2
+            exit 1
+          fi
+
+          if git grep -nIE '(gh[pousr]_[[:alnum:]]{36,}|github_pat_[[:alnum:]_]{40,}|AKIA[[:upper:][:digit:]]{16}|sk-[[:alnum:]_-]{32,})' -- .; then
+            printf '%s\n' 'A high-confidence credential pattern was found.' >&2
+            exit 1
+          fi
+
+          if git grep -nIE 'BEGIN [A-Z ]*PRIVATE KEY' -- .; then
+            printf '%s\n' 'A private-key marker was found.' >&2
+            exit 1
+          fi
+
+          printf '%s\n' 'Repository safety checks passed.'

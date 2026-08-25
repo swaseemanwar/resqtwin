@@ -1,0 +1,64 @@
+# Local AI and assistant instructions
+/AGENTS.md
+/AGENTS.override.md
+/.codex/
+/.codex-log/
+/CLAUDE.md
+/CLAUDE.local.md
+/.claude/
+/MEMORY.md
+/.mcp.json
+
+# Local workspace and environment
+/local/
+.env
+.env.*
+!.env.example
+
+# Local data products
+/data/raw/
+/data/processed/
+/data/generated/
+
+# MATLAB and Simulink generated files
+*.asv
+*.autosave
+*.m~
+*.slxc
+*.mex*
+*.p
+slprj/
+sccprj/
+codegen/
+*_ert_rtw/
+*_grt_rtw/
+*_rsim_rtw/
+*_sfprj/
+*_sfun_rtw/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Build, test, and logs
+/build/
+/dist/
+/coverage/
+/logs/
+*.log
+*.tmp
+
+# Editors and operating systems
+/.idea/
+/.vscode/
+*.code-workspace
+*~
+.DS_Store
+Thumbs.db

@@ -1,0 +1,14 @@
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# MathWorks model and application formats are binary.
+*.slx binary
+*.mlx binary
+*.mlapp binary
+*.mat binary
+*.fig binary
+*.sldd binary
+*.slreqx binary
+*.mldatx binary

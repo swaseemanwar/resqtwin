@@ -1,0 +1,7 @@
+# Simulation
+
+Use this directory for synthetic scenarios and simulator-facing assets.
+
+Start with minimal, deterministic scenarios that exercise the twin loop and expected failure modes. Record seeds, initial conditions, units, timing assumptions, and expected outcomes.
+
+Gazebo, ROS 2 simulation packages, or other engines may be introduced later if the locked architecture benefits from them. Keep engine-specific structure out of the repository until that decision is made.
