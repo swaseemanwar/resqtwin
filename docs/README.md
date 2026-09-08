@@ -11,3 +11,9 @@ Likely document types include:
 - verification evidence and demonstration instructions.
 
 Do not copy local assistant memory into tracked documentation. Convert useful conclusions into concise, team-reviewed records with clear provenance.
+
+## Current project records
+
+- [Getting Started](getting-started.md) — MATLAB setup and first-run checks
+- [Basic Landslide Twin MVP](proposals/basic-landslide-mvp.md) — `LOCKED`
+  first implementation scope; later features remain `PROPOSED LATER`

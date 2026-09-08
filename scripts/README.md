@@ -11,3 +11,11 @@ Scripts should:
 - have a focused test or dry-run path when practical.
 
 Do not add package installers or large orchestration frameworks until the project actually requires them.
+
+## Current entry points
+
+- `setupProject.m` adds the current source, simulation, and MATLAB script
+  folders to the MATLAB path.
+- `matlab/runProjectTests.m` runs the deterministic MATLAB tests.
+- `matlab/runBasicLandslideDemo.m` runs and plots the `LOCKED` basic
+  landslide scenario.
