@@ -11,3 +11,7 @@ MATLAB, Python, ROS 2, and embedded integrations can coexist here later without 
 `matlab/+resqtwin/` contains the reviewable MATLAB reference calculations for
 the `LOCKED` basic landslide MVP. It is kept independent from Simulink
 so its expected behavior can be unit tested before a block model is added.
+
+`matlab/+resqtwin/+ui/LandslideDashboard.m` displays the scenario's observations
+and manages playback. It uses the existing scenario output for slope state and
+road access, and releases its playback timer when the dashboard closes.

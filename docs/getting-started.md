@@ -8,7 +8,7 @@ Simulink models, sensors, hardware, AI, terrain, or multiple routes.
 ## Prerequisites
 
 - Git
-- An installed and activated MATLAB release
+- An installed and activated MATLAB R2026a (the documented release)
 - Simulink for the later block-model stage; it is not required by the current
   MATLAB reference calculation
 
@@ -92,32 +92,37 @@ Run:
 ```matlab
 run("scripts/setupProject.m")  % omit if the MATLAB Project configured the path
 results = runProjectTests();
-observations = runBasicLandslideDemo();
+dashboard = runLandslideDashboard();
 ```
 
 Expected behavior:
 
-- all tests pass;
-- scenario status is `LOCKED`;
-- the slope progresses through `SAFE`, `WATCH`, and `UNSAFE`;
-- the road begins open and ends closed; and
-- the demo plots factor of safety and emulated pore-water pressure.
+- all 23 tests pass;
+- the dashboard opens paused at 0 seconds with `SAFE` and road `OPEN`;
+- clicking **Play** progresses through `SAFE`, `WATCH`, and `UNSAFE`;
+- the road closes at 44 seconds and stays closed through 60 seconds; and
+- the plots reveal factor of safety and emulated pressure as playback advances.
+
+Use **Pause**, **Reset**, or the timeline slider to rehearse specific moments.
+The [dashboard guide](dashboard.md) describes the controls and checkpoints.
+The MVP scope remains `LOCKED`.
 
 If a function is not found, confirm the path configuration:
 
 ```matlab
 which resqtwin.infiniteSlopeFactorOfSafety
 which resqtwin.scenarios.basicLandslide
-which runBasicLandslideDemo
+which runLandslideDashboard
 ```
 
 ## First implementation sequence
 
 1. Make the existing deterministic tests pass on every team machine.
 2. Confirm and document the expected transition times and outputs.
-3. Add a minimal dashboard with the current risk state and road status.
-4. Add a Simulink model only after the MATLAB reference behavior is stable.
-5. Rehearse a repeatable 60-to-90-second demonstration.
+3. Verify the dashboard's displayed states at 0, 19, and 44 seconds.
+4. Rehearse a repeatable 60-to-90-second demonstration.
+
+A Simulink model remains a `PROPOSED` later addition.
 
 The basic MVP is complete when a new team member can open the project, run the
 tests, and reproduce the full observation-to-road-decision demonstration using

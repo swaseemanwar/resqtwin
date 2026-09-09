@@ -15,5 +15,6 @@ Do not copy local assistant memory into tracked documentation. Convert useful co
 ## Current project records
 
 - [Getting Started](getting-started.md) — MATLAB setup and first-run checks
+- [Dashboard Guide](dashboard.md) — playback controls and demonstration checkpoints
 - [Basic Landslide Twin MVP](proposals/basic-landslide-mvp.md) — `LOCKED`
   first implementation scope; later features remain `PROPOSED LATER`

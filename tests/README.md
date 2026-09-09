@@ -21,6 +21,8 @@ run("scripts/setupProject.m")
 results = runProjectTests();
 ```
 
-The 14 tests under `matlab/` cover the infinite-slope reference equation,
-the wetting trend, decision states, route status, the headless demo command,
-and invalid inputs.
+The 23 tests under `matlab/` cover the infinite-slope reference equation,
+the wetting trend, decision states, route status, demo commands, and invalid
+inputs. Nine dashboard tests also check displayed transitions and history,
+timeline selection, playback, pause/resume, reset, completion/replay, and timer
+cleanup. They create hidden UI figures and require MATLAB graphics support.

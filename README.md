@@ -14,10 +14,12 @@ The following features are implemented:
 - **SAFE / WATCH / UNSAFE** classification and **OPEN / CLOSED** road status.
 - A 60-second scenario with simulated water pressure.
 - Setup, test, and demo commands, including a pressure and factor-of-safety plot.
-- **14 automated MATLAB tests** for the calculations, rules, scenario, and demo.
+- An interactive dashboard with road and slope status, updating plots,
+  Play/Pause/Reset controls, and a timeline slider.
+- **23 automated MATLAB tests** for the calculations, scenario, demo, and dashboard.
 
-The calculation loop and basic plotting demo are available. A presentation-ready
-slope-state and road-status display is still to be added.
+The dashboard presents the observation-to-road-decision loop using the
+deterministic scenario. It opens paused at 0 seconds, ready for playback.
 
 ## How it works
 
@@ -43,20 +45,30 @@ validated for real road-safety decisions.
 
 ## Run in MATLAB
 
-Tested with **MATLAB R2026a**. Simulink is not required to run the current code.
+Use **MATLAB R2026a**. Simulink is not required to run the current code.
 
 Open the `resqtwin` repository as MATLAB's **Current Folder**, then run:
 
 ```matlab
 run("scripts/setupProject.m");
+dashboard = runLandslideDashboard();
+```
+
+Click **Play** to reveal the scenario one second at a time. **Pause** holds the
+current observation, **Reset** returns to 0 seconds, and the slider jumps to a
+selected time. The slope enters WATCH at 19 seconds and the road closes at
+44 seconds. At 60 seconds, playback stops and **Replay** starts again from zero.
+See the [dashboard guide](docs/dashboard.md) for demonstration checkpoints.
+
+For the full static plot and output table, use:
+
+```matlab
 observations = runBasicLandslideDemo();
 disp(observations);
 ```
 
-The output table contains pressure, factor of safety, slope state, and road
-status for each second from 0 to 60. `RouteOpen` is `true` when the road is open.
-In this example, the slope enters WATCH at 19 seconds and the road closes at
-44 seconds. Use `runBasicLandslideDemo(false)` to skip the plot.
+Use `runBasicLandslideDemo(false)` to skip the plot. `RouteOpen` in the output
+table is `true` when the road is open.
 
 To run the tests:
 
@@ -64,7 +76,7 @@ To run the tests:
 results = runProjectTests();
 ```
 
-Expected result: **14 passing tests**. See [Getting Started](docs/getting-started.md)
+Expected result: **23 passing tests**. See [Getting Started](docs/getting-started.md)
 for setup details and MATLAB Project instructions.
 
 ## Main files
@@ -74,13 +86,14 @@ for setup details and MATLAB Project instructions.
 | [infiniteSlopeFactorOfSafety.m](src/matlab/+resqtwin/infiniteSlopeFactorOfSafety.m) | Calculates slope stability. |
 | [classifySlopeState.m](src/matlab/+resqtwin/classifySlopeState.m) | Converts factor of safety into slope and road status. |
 | [basicLandslide.m](simulation/matlab/+resqtwin/+scenarios/basicLandslide.m) | Runs the 60-second pressure scenario. |
-| [scripts/matlab/](scripts/matlab/) | Runs the tests and plotting demo after setup. |
+| [LandslideDashboard.m](src/matlab/+resqtwin/+ui/LandslideDashboard.m) | Displays the current observation and manages playback. |
+| [scripts/matlab/](scripts/matlab/) | Launches the dashboard, tests, and static demo after setup. |
 | [tests/matlab/](tests/matlab/) | Checks the calculations, thresholds, and scenario. |
 
 ## Next steps
 
-1. Add a clear slope-state and road-status display.
-2. Rehearse the complete observation-to-road-decision demonstration.
+1. Rehearse the complete observation-to-road-decision demonstration.
+2. Record team test results and demonstration evidence.
 
 A Simulink model, physical sensors, and AI forecasting remain **PROPOSED**
 later additions. Decisions become **LOCKED** when explicitly agreed; replaced

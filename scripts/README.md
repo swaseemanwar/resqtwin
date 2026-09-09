@@ -19,3 +19,5 @@ Do not add package installers or large orchestration frameworks until the projec
 - `matlab/runProjectTests.m` runs the deterministic MATLAB tests.
 - `matlab/runBasicLandslideDemo.m` runs and plots the `LOCKED` basic
   landslide scenario.
+- `matlab/runLandslideDashboard.m` opens the interactive scenario dashboard
+  with Play/Pause/Reset controls and a timeline slider.
