@@ -1,104 +1,43 @@
 # ResQTwin
 
-ResQTwin is a MATLAB prototype that shows how rising water pressure in soil
-affects slope stability and whether a nearby road stays open.
+ResQTwin is a MATLAB and Simscape digital twin prototype that physically simulates how rising pore water pressure inside soil affects slope stability and road safety.
 
-Built for **MATRIX 2026**, **AI in Disaster Management**, PS7:
-**“Disaster Area Digital Twin.”**
+Built for **AI in Disaster Management**, PS7: **“Disaster Area Digital Twin.”**
 
-## Current status
+## Current Status: Phase 1 (Hydro-Mechanical Co-Simulation)
 
-The following features are implemented:
+A fully physics-based **Hydro-Mechanical Co-Simulation** plant model. 
 
-- Factor-of-safety calculation for a slope.
-- **SAFE / WATCH / UNSAFE** classification and **OPEN / CLOSED** road status.
-- A 60-second scenario with simulated water pressure.
-- Setup, test, and demo commands, including a pressure and factor-of-safety plot.
-- An interactive dashboard with road and slope status, updating plots,
-  Play/Pause/Reset controls, and a timeline slider.
-- **23 automated MATLAB tests** for the calculations, scenario, demo, and dashboard.
+The following physical features are now implemented:
+*   **Simscape Multibody 3D Environment:** A stationary bedrock foundation (`Static_Bedrock`) and a 3D sliding soil mass (`Sliding_Soil_Mass`) connected via a prismatic joint.
+*   **Simscape Fluids Hydraulic Circuit:** Simulates dynamic pore water pressure ($u$) buildup inside the soil matrix using an Isothermal Liquid domain.
+*   **Mohr-Coulomb Geotechnical Solver:** Dynamically calculates shear resistance using the real-world formula $\tau = c + (\sigma - u) \tan\phi$. As fluid pressure ($u$) builds, effective stress drops to zero and the 3D block physically ruptures and slides.
+*   **Dynamic Scenario Driver:** A Signal Editor feeds a customized 60-second rainfall pressure surge scenario directly into the physical fluid pump.
 
-The dashboard presents the observation-to-road-decision loop using the
-deterministic scenario. It opens paused at 0 seconds, ready for playback.
+## How to Run & Verify the New Model
 
-## How it works
+To run this model, **Simulink**, **Simscape**, **Simscape Multibody**, and **Simscape Fluids** toolboxes installed.
 
-**LOCKED MVP:** one slope with uniform soil, at risk of a shallow landslide,
-and one road segment. The intended user is an incident commander reviewing
-the simulated road status.
+1. **Initialize the Environment:** Open the `resqtwin` repository folder in MATLAB. Double-click the MATLAB Project file (`.prj`) to automatically load all paths and variables, or manually run `run("scripts/setupProject.m")` in the command window.
+2. **Open the Plant Model:** Open the new `ResQTwin_Plant.slx` file from the Current Folder.
+3. **Run the Simulation:** Ensure the simulation Stop Time is set to `60` seconds, then click the green **Run** button.
+4. **View the Results:**
+   *   **Mechanics Explorer:** Open the 3D visualization window. You will see the `Sliding_Soil_Mass` physically slide down the bedrock incline as water pressure surges.
+   *   **Pressure Scope:** Double-click the `Scope` block connected to the sensor to monitor the live pore water pressure ($u$) trace over the 60-second run.
 
-```text
-Water pressure -> Factor of safety -> Slope state -> Road status
-```
-
-Factor of safety (FS) compares the stresses resisting sliding with those
-causing it. The current example uses these rules:
-
-| Factor of safety | Slope state | Road status |
-| --- | --- | --- |
-| FS >= 1.3 | SAFE | OPEN |
-| 1.0 <= FS < 1.3 | WATCH | OPEN |
-| FS < 1.0 | UNSAFE | CLOSED |
-
-This prototype uses example soil values and simulated pressure. It is not
-validated for real road-safety decisions.
-
-## Run in MATLAB
-
-Use **MATLAB R2026a**. Simulink is not required to run the current code.
-
-Open the `resqtwin` repository as MATLAB's **Current Folder**, then run:
-
-```matlab
-run("scripts/setupProject.m");
-dashboard = runLandslideDashboard();
-```
-
-Click **Play** to reveal the scenario one second at a time. **Pause** holds the
-current observation, **Reset** returns to 0 seconds, and the slider jumps to a
-selected time. The slope enters WATCH at 19 seconds and the road closes at
-44 seconds. At 60 seconds, playback stops and **Replay** starts again from zero.
-See the [dashboard guide](docs/dashboard.md) for demonstration checkpoints.
-
-For the full static plot and output table, use:
-
-```matlab
-observations = runBasicLandslideDemo();
-disp(observations);
-```
-
-Use `runBasicLandslideDemo(false)` to skip the plot. `RouteOpen` in the output
-table is `true` when the road is open.
-
-To run the tests:
-
-```matlab
-results = runProjectTests();
-```
-
-Expected result: **23 passing tests**. See [Getting Started](docs/getting-started.md)
-for setup details and MATLAB Project instructions.
-
-## Main files
+## Updated Main Files
 
 | File or folder | Purpose |
 | --- | --- |
-| [infiniteSlopeFactorOfSafety.m](src/matlab/+resqtwin/infiniteSlopeFactorOfSafety.m) | Calculates slope stability. |
-| [classifySlopeState.m](src/matlab/+resqtwin/classifySlopeState.m) | Converts factor of safety into slope and road status. |
-| [basicLandslide.m](simulation/matlab/+resqtwin/+scenarios/basicLandslide.m) | Runs the 60-second pressure scenario. |
-| [LandslideDashboard.m](src/matlab/+resqtwin/+ui/LandslideDashboard.m) | Displays the current observation and manages playback. |
-| [scripts/matlab/](scripts/matlab/) | Launches the dashboard, tests, and static demo after setup. |
-| [tests/matlab/](tests/matlab/) | Checks the calculations, thresholds, and scenario. |
+| `ResQTwin_Plant.slx` | **[NEW]** The core Simscape Multibody and Simscape Fluids co-simulation plant model. |
+| `Rainfall_Pressure_Scenario.mat` | **[NEW]** The 60-second Signal Editor dataset driving the dynamic fluid pressure pump. |
+| `infiniteSlopeFactorOfSafety.m` | *(Superseded by Simscape solver)* Calculated basic slope stability. |
+| `classifySlopeState.m` | *(Pending AI update)* Converts factor of safety into SAFE/WATCH/UNSAFE road status. |
+| `scripts/matlab/` | Launches legacy dashboard, tests, and static demo after setup. |
 
-## Next steps
+## Next Steps
 
-1. Rehearse the complete observation-to-road-decision demonstration.
-2. Record team test results and demonstration evidence.
-
-A Simulink model, physical sensors, and AI forecasting remain **PROPOSED**
-later additions. Decisions become **LOCKED** when explicitly agreed; replaced
-decisions are marked **SUPERSEDED**.
-
-Keep commits small and focused. See [CONTRIBUTING.md](CONTRIBUTING.md) for the
-branch, pull request, and repository rules. Shared requirements and decisions
-belong under [docs/](docs/).
+1. **Phase 2: AI Predictive Forecasting:** We will route the live shear stress ($\tau$) and normal stress ($\sigma$) outputs from Simscape into the Deep Learning / Predictive Maintenance Toolbox to train an LSTM model that predicts the Factor of Safety 15 to 30 minutes ahead.
+2. **Phase 3: Stateflow Control Logic:** Implement a Stateflow chart to manage automated SAFE/WATCH/UNSAFE state transitions based on the AI forecast.
+3. **Phase 4: Hardware-in-the-Loop (HIL):** Replace the simulated Signal Editor with live STM32/ESP32 sensor telemetry. We will use a Multi-Criteria Network Digital Twin (MNDT) architecture to dynamically switch between Wi-Fi, LoRa, and 5G to maximize the Packet Delivery Ratio (PDR) during severe storms.
+4. **Final Packaging:** Ensure the `.prj` file passes the MATLAB Dependency Analyzer so it runs flawlessly on the judges' machines.
