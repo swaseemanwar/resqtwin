@@ -11,11 +11,13 @@ parameters.cohesionKPa = 5;
 parameters.frictionAngleDeg = 32;
 parameters.watchThreshold = 1.3;
 
-% Hold at 0 kPa, rise from 10 to 50 seconds, then hold at 12 kPa.
+% FLASH FLOOD SCENARIO: Assess slope stability under extreme environmental conditions
 timeSeconds = (0:60)';
-porePressureKPa = 0.3 * (timeSeconds - 10);
-porePressureKPa(timeSeconds < 10) = 0;
-porePressureKPa(timeSeconds > 50) = 12;
+porePressureKPa = zeros(61, 1); % Base safe condition
+
+% Inject a severe flash flood pressure spike at t = 30 seconds
+porePressureKPa(31:46) = linspace(0, 25, 16)'; % Rapid build-up to 25 kPa
+porePressureKPa(47:61) = linspace(25, 15, 15)'; % Gradual receding water
 
 % Calculate slope safety and whether the road stays open.
 factorOfSafety = resqtwin.infiniteSlopeFactorOfSafety( ...
